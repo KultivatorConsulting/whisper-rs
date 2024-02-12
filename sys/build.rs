@@ -120,6 +120,7 @@ fn main() {
     }
 
     if cfg!(feature = "cuda") {
+        config.define("CUDA_ARCHITECTURES", "native");
         config.define("WHISPER_CUBLAS", "ON");
     }
 
