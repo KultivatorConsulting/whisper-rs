@@ -41,18 +41,17 @@ fn main() {
     }
     #[cfg(feature = "cuda")]
     {
-        println!("cargo:rustc-link-lib=cublas");
-        println!("cargo:rustc-link-lib=cudart");
-        println!("cargo:rustc-link-lib=cublasLt");
+        println!("cargo:rustc-link-lib=dylib=cublas");
+        println!("cargo:rustc-link-lib=dylib=cudart");
+        println!("cargo:rustc-link-lib=dylib=cublasLt");
         cfg_if::cfg_if! {
             if #[cfg(target_os = "windows")] {
                 let cuda_path = PathBuf::from(env::var("CUDA_PATH").unwrap()).join("lib/x64");
                 println!("cargo:rustc-link-search={}", cuda_path.display());
             } else {
-                println!("cargo:rustc-link-lib=culibos");
+                println!("cargo:rustc-link-lib=dylib=culibos");
                 println!("cargo:rustc-link-search=/usr/local/cuda/lib64");
                 println!("cargo:rustc-link-search=/opt/cuda/lib64");
-                println!("cargo:rustc-link-search=/usr/local/cuda/targets/x86_64-linux/lib");
             }
         }
     }
@@ -107,7 +106,7 @@ fn main() {
 
     config
         .profile("Release")
-        .define("BUILD_SHARED_LIBS", "OFF")
+        .define("BUILD_SHARED_LIBS", "ON")
         .define("WHISPER_ALL_WARNINGS", "OFF")
         .define("WHISPER_ALL_WARNINGS_3RD_PARTY", "OFF")
         .define("WHISPER_BUILD_TESTS", "OFF")
@@ -121,8 +120,8 @@ fn main() {
     }
 
     if cfg!(feature = "cuda") {
-        config.define("CMAKE_CUDA_COMPILER", "/usr/local/cuda/bin/nvcc");
-        config.define("CMAKE_CUDA_ARCHITECTURES", "86-real");
+        // config.define("CMAKE_CUDA_COMPILER", "/usr/local/cuda/bin/nvcc");
+        // config.define("CMAKE_CUDA_ARCHITECTURES", "52;61;70");
         config.define("WHISPER_CUBLAS", "ON");
     }
 
@@ -158,7 +157,7 @@ fn main() {
         println!("cargo:rustc-link-search={}", out.join("build").display());
     }
     println!("cargo:rustc-link-search=native={}", destination.display());
-    println!("cargo:rustc-link-lib=static=whisper");
+    println!("cargo:rustc-link-lib=dylib=whisper");
 
     // for whatever reason this file is generated during build and triggers cargo complaining
     _ = std::fs::remove_file("bindings/javascript/package.json");
