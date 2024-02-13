@@ -106,7 +106,6 @@ fn main() {
 
     config
         .profile("Release")
-        .define("BUILD_SHARED_LIBS", "ON")
         .define("WHISPER_ALL_WARNINGS", "OFF")
         .define("WHISPER_ALL_WARNINGS_3RD_PARTY", "OFF")
         .define("WHISPER_BUILD_TESTS", "OFF")
@@ -120,9 +119,11 @@ fn main() {
     }
 
     if cfg!(feature = "cuda") {
-        // config.define("CMAKE_CUDA_COMPILER", "/usr/local/cuda/bin/nvcc");
-        // config.define("CMAKE_CUDA_ARCHITECTURES", "52;61;70");
+        config.define("BUILD_SHARED_LIBS", "ON");
         config.define("WHISPER_CUBLAS", "ON");
+    } else {
+        config.define("BUILD_SHARED_LIBS", "OFF");
+        config.define("WHISPER_CUBLAS", "OFF");
     }
 
     if cfg!(feature = "openblas") {
@@ -157,7 +158,12 @@ fn main() {
         println!("cargo:rustc-link-search={}", out.join("build").display());
     }
     println!("cargo:rustc-link-search=native={}", destination.display());
-    println!("cargo:rustc-link-lib=dylib=whisper");
+
+    if cfg!(feature = "cuda") {
+        println!("cargo:rustc-link-lib=dylib=whisper");
+    } else {
+        println!("cargo:rustc-link-lib=static=whisper");
+    }
 
     // for whatever reason this file is generated during build and triggers cargo complaining
     _ = std::fs::remove_file("bindings/javascript/package.json");
