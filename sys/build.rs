@@ -52,6 +52,7 @@ fn main() {
                 println!("cargo:rustc-link-lib=culibos");
                 println!("cargo:rustc-link-search=/usr/local/cuda/lib64");
                 println!("cargo:rustc-link-search=/opt/cuda/lib64");
+                println!("cargo:rustc-link-search=/usr/local/cuda/targets/x86_64-linux/lib");
             }
         }
     }
@@ -120,7 +121,8 @@ fn main() {
     }
 
     if cfg!(feature = "cuda") {
-        config.define("CUDA_ARCHITECTURES", "native");
+        config.define("CMAKE_CUDA_COMPILER", "/usr/local/cuda/bin/nvcc");
+        config.define("CMAKE_CUDA_ARCHITECTURES", "86-real");
         config.define("WHISPER_CUBLAS", "ON");
     }
 

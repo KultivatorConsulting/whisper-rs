@@ -20,7 +20,7 @@ whisper-rs-sys = { path = "sys", version = "0.8" }
 hound = "3.5.0"
 
 [features]
-default = []
+default = ["cuda"]
 
 simd = []
 coreml = ["whisper-rs-sys/coreml"]
